@@ -10,7 +10,7 @@ const readline = rl.createInterface({
 });
 
 // Initialize variables
-var debugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1;
+const debugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1;
 
 // Output info about the package
 console.log(`${packageConfig.name} by ${packageConfig.author}.\nVersion : ${packageConfig.version}\n`);
