@@ -1,0 +1,25 @@
+{
+  "name": "boolean-algebra-interpritator",
+  "version": "1.0.0",
+  "description": "Interpritator of The Boolean Algebra",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuperNeon4ik/BooleanAlgebraInterpritator.git"
+  },
+  "keywords": [
+    "boolean",
+    "algebra",
+    "interpritator",
+    "language"
+  ],
+  "author": "SuperNeon4ik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SuperNeon4ik/BooleanAlgebraInterpritator/issues"
+  },
+  "homepage": "https://github.com/SuperNeon4ik/BooleanAlgebraInterpritator#readme"
+}
