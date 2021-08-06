@@ -4,7 +4,8 @@
   "description": "Interpritator of The Boolean Algebra",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "run": "node index.js",
+    "debug": "node index.js --debug-mode"
   },
   "repository": {
     "type": "git",
