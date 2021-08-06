@@ -1,5 +1,5 @@
 const colorRegex = /(\\x1b\[[0-8,30-37,40-47]m)*/g;
-const codeRegex = /((?<!\\)\&[[0-6]a,[0-7][b,c]])*/g;
+const codeRegex = /((?<!\\)\&[[0-6]a,[0-7][b,c],[0-4]d])*/g;
 
 // Main Colors
 const RESET = "\x1b[0m";
@@ -30,6 +30,13 @@ const BG_MAGENTA = "\x1b[45m";
 const BG_CYAN = "\x1b[46m";
 const BG_WHITE = "\x1b[47m";
 
+// Color Combos
+const CC_EXTRA_WHITE = FG_WHITE + BRIGHT;
+const CC_BRIGHT_RED = FG_RED + BRIGHT;
+const CC_BRIGHT_YELLOW = FG_YELLOW + BRIGHT;
+const CC_BRIGHT_GREEN = FG_GREEN + BRIGHT;
+const CC_BRIGHT_CYAN = FG_CYAN + BRIGHT;
+
 // Color Codes
 const ColorCodes = {
     "&0a": RESET,
@@ -57,6 +64,12 @@ const ColorCodes = {
     "&5c": BG_MAGENTA,
     "&6c": BG_CYAN,
     "&7c": BG_WHITE,
+
+    "&0d": CC_EXTRA_WHITE,
+    "&1d": CC_BRIGHT_RED,
+    "&2d": CC_BRIGHT_YELLOW,
+    "&3d": CC_BRIGHT_GREEN,
+    "&4d": CC_BRIGHT_CYAN,
 };
 
 function generateConsolePrefix(color) {
@@ -69,23 +82,26 @@ function generateConsolePrefix(color) {
 }
 
 function replaceColorCodes(input) {
-    let matches = input.match(/&\d[a,b,c]/g);
+    let matches = input.match(/&\d[a,b,c,d]/g);
 
-    matches.forEach(el => {
-        if (ColorCodes[el] != undefined) input = input.replace(el, ColorCodes[el]);
-    });
+    if (matches != null) {
+        matches.forEach(el => {
+            if (ColorCodes[el] != undefined) input = input.replace(el, ColorCodes[el]);
+        });
+    }
     
     return input + RESET;
 }
 
 function log(input) {
-    console.log(replaceColorCodes(input) + RESET);
+    console.log(generateConsolePrefix("&0a"), replaceColorCodes(input) + RESET);
 }
 
 module.exports = { 
     RESET, BRIGHT, DIM, UNDERSCORE, BLINK, REVERSE, HIDDEN,
     FG_BLACK, FG_RED, FG_GREEN, FG_YELLOW, FG_BLUE, FG_MAGENTA, FG_CYAN, FG_WHITE,
     BG_BLACK, BG_RED, BG_GREEN, BG_YELLOW, BG_BLUE, BG_MAGENTA, BG_CYAN, BG_WHITE,
+    CC_EXTRA_WHITE, CC_BRIGHT_RED, CC_BRIGHT_YELLOW, CC_BRIGHT_GREEN, CC_BRIGHT_CYAN,
 
     generateConsolePrefix, replaceColorCodes, log
 };

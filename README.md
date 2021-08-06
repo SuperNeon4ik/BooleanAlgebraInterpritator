@@ -1,4 +1,4 @@
 Boolean Algebra Interpritator
 ---
-File extention : `.bas` (boolean algebra script)
+File extention : `.boolscript` (Boolean-algebra Script)
 

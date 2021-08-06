@@ -1,6 +1,7 @@
 // Initializing Libraries & Packages
-const packageConfig = require("./package.json");
+const fs = require("fs");
 const rl = require("readline");
+const packageConfig = require("./package.json");
 const ChatColor = require("./modules/ChatColor");
 
 // Initializing readline
@@ -21,11 +22,39 @@ if (debugMode) ChatColor.log("&6bHandled arguments : &0a[ " + process.argv.join(
 
 // Check if file is provided in arguments
 if (process.argv.length < (debugMode ? 4 : 3)) {
-    // Has file path provided
-    
+    // Has no file path provided
 }
 else {
-    // Has no file path provided
+    // Has file path provided
+    let file = undefined;
+    process.argv.forEach((el, i) => {
+        if (i > 1 && el.endsWith(".boolscript")) {
+            file = el;
+        }
+    });
+
+    if (file == undefined) {
+        ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "No '.boolscript' file found in arguments.");
+        return;  
+    }
+    else {
+        if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "File FOUND : " + ChatColor.RESET + file);
+        if (/[A-Z]:\\.*/g.test(file)) {
+            // Is a PATH
+        }
+        else {
+            // is NOT a PATH
+        }
+
+        try {
+            let contents = fs.readFileSync(file);
+            if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found:${ChatColor.RESET}\n${contents}`);
+        }
+        catch (ex) {
+            ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "Can't read the file '" + file + "'.");
+            return;  
+        }
+    }
 }
 
 readline.close(); // close since we don't use readline yet.
