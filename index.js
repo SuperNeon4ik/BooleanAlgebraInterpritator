@@ -22,8 +22,10 @@ if (debugMode) ChatColor.log("&6bHandled arguments : &0a[ " + process.argv.join(
 // Check if file is provided in arguments
 if (process.argv.length < (debugMode ? 4 : 3)) {
     // Has file path provided
-    readline.close();
+    
 }
 else {
     // Has no file path provided
 }
+
+readline.close(); // close since we don't use readline yet.
