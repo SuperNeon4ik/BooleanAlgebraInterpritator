@@ -2,7 +2,9 @@
 const fs = require("fs");
 const rl = require("readline");
 const packageConfig = require("./package.json");
+
 const ChatColor = require("./modules/ChatColor");
+const fileLauncher = require("./fileLauncher");
 
 // Initializing readline
 const readline = rl.createInterface({
