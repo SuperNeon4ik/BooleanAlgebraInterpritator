@@ -94,7 +94,7 @@ function replaceColorCodes(input) {
 }
 
 function log(input) {
-    console.log(generateConsolePrefix("&0a"), replaceColorCodes(input) + RESET);
+    console.log(replaceColorCodes(input) + RESET);
 }
 
 module.exports = { 

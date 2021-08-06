@@ -39,12 +39,6 @@ else {
     }
     else {
         if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "File FOUND : " + ChatColor.RESET + file);
-        if (/[A-Z]:\\.*/g.test(file)) {
-            // Is a PATH
-        }
-        else {
-            // is NOT a PATH
-        }
 
         try {
             let contents = fs.readFileSync(file);
