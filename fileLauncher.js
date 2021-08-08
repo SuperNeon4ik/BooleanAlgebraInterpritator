@@ -23,7 +23,7 @@ function parse(plainText) {
                 if (el2 != "") {
                     let parsingError = ParsingError.NONE;
                     try {
-                        if (el2 == "and") {
+                        if (el2 == "and" || el2 == "or") {
                             if (i2 <= 0 || i2 >= subtokens.length - 1) parsingError = ParsingError.WRONG_USAGE;
                             else {
                                 let str1 = pretokens.pop();
@@ -44,30 +44,30 @@ function parse(plainText) {
                                 else {
                                     let result = undefined;
 
-                                    if (val1 && val2) result = val1;
-                                    else if (!val1 && !val2) result = val1;
-                                    else if (!val1 && val2) result = val1;
-                                    else if (val1 && !val2) result = val2;
+                                    if (el2 == "and") {
+                                        if (val1 && val2) result = val1;
+                                        else if (!val1 && !val2) result = val1;
+                                        else if (!val1 && val2) result = val1;
+                                        else if (val1 && !val2) result = val2;
+                                    }
+                                    else if (el2 == "or") {
+                                        if (val1 && val2) result = val1;
+                                        else if (!val1 && !val2) result = val1;
+                                        else if (!val1 && val2) result = val1;
+                                        else if (val1 && !val2) result = val2;
+                                    }
 
-                                    subtokens[i2 + 1] = result ? "1" : "0";
-                                    //pretokens.push(result ? 1 : 0);
+                                    if (result == undefined) parsingError = ParsingError.UNEXPECTED_ERROR;
+                                    else {
+                                        subtokens[i2 + 1] = result ? "1" : "0";
 
-                                    if (debugMode) 
-                                        chatColor.log(`&6bINFO &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
+                                        if (debugMode) 
+                                            chatColor.log(`&6bINFO &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
+                                    }
                                 }
                             }
                         }
                         else {
-                            /*let isNextToMixedToken = true;
-                            if (i2 >= subtokens.length - 1) isNextToMixedToken = false;
-                            else if (!MixedArgumentationTokens.includes(subtokens[i2 + 1])) isNextToMixedToken = false;
-                            else if (i2 <= 0) isNextToMixedToken = false;
-                            else if (!MixedArgumentationTokens.includes(subtokens[i2 - 1])) isNextToMixedToken = false;
-
-                            if (el2 == 0 || el2 == 1) {
-                                if (!isNextToMixedToken) pretokens.push(el2);
-                            }
-                            else pretokens.push(el2);*/
                             pretokens.push(el2);
                         }
                     }
@@ -109,7 +109,16 @@ function parse(plainText) {
 }
 
 function deploy(tokens) {
-    chatColor.log("&6bINFO &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]")
+    if (debugMode)
+        chatColor.log("&6bINFO &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
+
+    tokens.forEach((el, i) => {
+        if (el[0].startsWith("print")) {
+            let text = el[1];
+            if (text == undefined) text = el[0].substring(7, el[0].length - 1);
+            chatColor.log("&4bOUT &0a" + text);
+        }
+    });
 }
 
 function execute(plainText, isDebugMode) {

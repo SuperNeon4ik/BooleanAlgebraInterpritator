@@ -2,7 +2,7 @@
 # a = input "A : ";
 # b = input "B : ";
 
-# print "Here are the outputs.";
+print "Here are the outputs.";
 # print "A and B = {a and b}";
 # print "A or B = {a or b}";
 
@@ -11,6 +11,6 @@ print 0;
 print 0 and 1;
 print 1 and 1;
 print 0 and 0;
-#print 0 or 1;
-#print 1 or 1;
-#print 0 or 0;
+print 0 or 1;
+print 1 or 1;
+print 0 or 0;

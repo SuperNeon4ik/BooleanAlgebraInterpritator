@@ -1,11 +1,12 @@
 {
   "name": "boolean-algebra-interpritator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Interpritator of The Boolean Algebra",
   "main": "index.js",
   "scripts": {
     "run": "node index.js",
     "debug": "node index.js --debug-mode",
+    "runTest": "node index.js test.boolscript",
     "debugTest": "node index.js test.boolscript --debug-mode"
   },
   "repository": {
