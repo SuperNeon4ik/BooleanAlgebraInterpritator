@@ -16,7 +16,8 @@ const readline = rl.createInterface({
 const isDebugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1;
 
 // Output info about the package
-console.log(`${packageConfig.name} by ${packageConfig.author}.\nVersion : ${packageConfig.version}\n`);
+ChatColor.log(`${packageConfig.name} by ${packageConfig.author}.\n` +
+    `Version : ${packageConfig.version} &1bPROTOTYPE VERSION\n`);
 if (isDebugMode) ChatColor.log("&3bWARNING &0dDebug Mode is enabled.\n");
 
 // DEBUG : Output handled arguments
