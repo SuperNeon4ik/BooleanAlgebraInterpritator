@@ -43,8 +43,17 @@ else {
         if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "File FOUND : " + ChatColor.RESET + file);
 
         try {
-            let contents = fs.readFileSync(file);
+            let contents = fs.readFileSync(file).toString();
             if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found:${ChatColor.RESET}\n${contents}`);
+
+            try {
+                fileLauncher.execute(contents);
+            }
+            catch (ex) {
+                ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "Failed to execute the code '" + file + "'.");
+                console.log(ex);
+                return;
+            }
         }
         catch (ex) {
             ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "Can't read the file '" + file + "'.");
@@ -54,3 +63,7 @@ else {
 }
 
 readline.close(); // close since we don't use readline yet.
+
+function isDebugMode() { return process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1; }
+
+module.exports = { isDebugMode };
