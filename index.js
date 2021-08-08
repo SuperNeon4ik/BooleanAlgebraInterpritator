@@ -17,10 +17,10 @@ const isDebugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mo
 
 // Output info about the package
 console.log(`${packageConfig.name} by ${packageConfig.author}.\nVersion : ${packageConfig.version}\n`);
-if (isDebugMode) console.log(ChatColor.generateConsolePrefix("&3b"), "WARNING !!! Debug Mode is enabled.\n");
+if (isDebugMode) ChatColor.log("&3bWARNING &0dDebug Mode is enabled.\n");
 
 // DEBUG : Output handled arguments
-if (isDebugMode) ChatColor.log("&6bHandled arguments : &0a[ " + process.argv.join(", ") + " ]");
+if (isDebugMode) ChatColor.log("&6bDEBUG &0dHandled arguments : &0a[ " + process.argv.join(", ") + " ]");
 
 // Check if file is provided in arguments
 if (process.argv.length < (isDebugMode ? 4 : 3)) {
@@ -48,11 +48,11 @@ function runTheProvidedFile() {
         return;  
     }
     else {
-        if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "File FOUND : " + ChatColor.RESET + file);
+        if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "DEBUG " + ChatColor.CC_EXTRA_WHITE + "File FOUND : " + ChatColor.RESET + file);
 
         try {
             let contents = fs.readFileSync(file).toString();
-            if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found:${ChatColor.RESET}\n${contents}`);
+            if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found.`);
 
             try {
                 fileLauncher.execute(contents, isDebugMode);

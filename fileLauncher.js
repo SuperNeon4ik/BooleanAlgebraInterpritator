@@ -62,7 +62,7 @@ function parse(plainText) {
                                         subtokens[i2 + 1] = result ? "1" : "0";
 
                                         if (debugMode) 
-                                            chatColor.log(`&6bINFO &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
+                                            chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
                                     }
                                 }
                             }
@@ -91,7 +91,7 @@ function parse(plainText) {
                         return null;
                     }
 
-                    if (debugMode) chatColor.log(`&6bINFO &0dT${i}S${i2} : &0a${el2}`);
+                    if (debugMode) chatColor.log(`&6bDEBUG &0dT${i}S${i2} : &0a${el2}`);
                 }
             });
 
@@ -110,7 +110,7 @@ function parse(plainText) {
 
 function deploy(tokens) {
     if (debugMode)
-        chatColor.log("&6bINFO &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
+        chatColor.log("&6bDEBUG &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
 
     tokens.forEach((el, i) => {
         if (el[0].startsWith("print")) {
