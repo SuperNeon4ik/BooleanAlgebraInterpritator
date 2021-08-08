@@ -13,21 +13,29 @@ const readline = rl.createInterface({
 });
 
 // Initialize variables
-const debugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1;
+const isDebugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1;
 
 // Output info about the package
 console.log(`${packageConfig.name} by ${packageConfig.author}.\nVersion : ${packageConfig.version}\n`);
-if (debugMode) console.log(ChatColor.generateConsolePrefix("&3b"), "WARNING !!! Debug Mode is enabled.\n");
+if (isDebugMode) console.log(ChatColor.generateConsolePrefix("&3b"), "WARNING !!! Debug Mode is enabled.\n");
 
 // DEBUG : Output handled arguments
-if (debugMode) ChatColor.log("&6bHandled arguments : &0a[ " + process.argv.join(", ") + " ]");
+if (isDebugMode) ChatColor.log("&6bHandled arguments : &0a[ " + process.argv.join(", ") + " ]");
 
 // Check if file is provided in arguments
-if (process.argv.length < (debugMode ? 4 : 3)) {
+if (process.argv.length < (isDebugMode ? 4 : 3)) {
     // Has no file path provided
 }
 else {
     // Has file path provided
+    runTheProvidedFile();
+}
+
+readline.close(); // close since we don't use readline yet.
+
+/* FUNCTIONS */
+
+function runTheProvidedFile() {
     let file = undefined;
     process.argv.forEach((el, i) => {
         if (i > 1 && el.endsWith(".boolscript")) {
@@ -40,18 +48,18 @@ else {
         return;  
     }
     else {
-        if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "File FOUND : " + ChatColor.RESET + file);
+        if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "File FOUND : " + ChatColor.RESET + file);
 
         try {
             let contents = fs.readFileSync(file).toString();
-            if (debugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found:${ChatColor.RESET}\n${contents}`);
+            if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found:${ChatColor.RESET}\n${contents}`);
 
             try {
-                fileLauncher.execute(contents);
+                fileLauncher.execute(contents, isDebugMode);
             }
             catch (ex) {
                 ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "Failed to execute the code '" + file + "'.");
-                console.log(ex);
+                if (isDebugMode) console.log(ex);
                 return;
             }
         }
@@ -61,9 +69,3 @@ else {
         }
     }
 }
-
-readline.close(); // close since we don't use readline yet.
-
-function isDebugMode() { return process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1; }
-
-module.exports = { isDebugMode };
