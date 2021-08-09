@@ -1,6 +1,5 @@
 const chatColor = require("./modules/ChatColor");
 
-const MixedArgumentationTokens = [ "and", "or" ];
 var debugMode = false;
 const ParsingError = { 
     NONE: "NONE",
@@ -147,11 +146,11 @@ function deploy(tokens) {
     tokens.forEach((el, i) => {
         if (el[0].startsWith("print")) {
             let text = el[1];
-            if (text == undefined)
+
+            if (el[0].trim() == "print" && el.length == 1)
+                text = "";
+            else if (text == undefined)
                 text = el[0].substring(7, el[0].length - 1);
-            else if (el.length == 1) {
-                chatColor.log("");
-            }
             else if (el.length > 2)
                 chatColor.log("&1bERR &0dUnexpected argument count for token 'print'. &0aToken string : '" + el + "'")
             else {
