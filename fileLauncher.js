@@ -19,7 +19,7 @@ function parse(plainText) {
             let subtokens = el.split(/(?<!".*)\s+(?!.*")/g);
             let pretokens = [];
 
-            // parsing 'not'
+            // parsing 'not' and strings
             subtokens.forEach((el2, i2) => {
                 if (el2 != "") {
                     let parsingError = ParsingError.NONE;
@@ -43,8 +43,11 @@ function parse(plainText) {
                                 }
                             }
                         }
-                        else if (el2.startsWith("print \"")) {
-                            let text = /(?<=").+(?=")/g.exec(el2)[0];
+                        
+                        const regexExec = /(?<=").+(?=")/g.exec(el2);
+                        if (regexExec != null) {
+                            const original = regexExec[0];
+                            let text = original;
                             const tags = /{.+}/g.exec(text);
 
                             if (tags != null) {
@@ -58,10 +61,7 @@ function parse(plainText) {
                                 });
                             }
 
-                            text = text.replace(/\\n/g, "\n&4bOUT &0a");
-                            text = text.replace(/\\t/g, "\t");
-
-                            subtokens[i2] = "print \"" + text + "\"";
+                            subtokens[i2] = el2.replace(original, text);
                         }
                     }
                     catch (err) {
@@ -166,6 +166,18 @@ function deploy(tokens) {
         chatColor.log("&6bDEBUG &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
 
     tokens.forEach((el, i) => {
+        el.forEach((el2, i2) => {
+            const regexExec = /(?<=").+(?=")/g.exec(el2);
+            if (regexExec != null) {
+                const original = regexExec[0];
+                let text = original;
+
+                text = text.replace(/\\n/g, "\n&4bOUT &0a");
+                text = text.replace(/\\t/g, "\t");
+                el[i2] = el2.replace(original, text);
+            }   
+        });
+
         if (el[0].startsWith("print")) {
             let text = el[1];
 
