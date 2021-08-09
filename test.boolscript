@@ -1,10 +1,12 @@
 # print "Provide your inputs.";
 # a = input "A : ";
 # b = input "B : ";
+a = 1;
+b = 0;
 
 print "Here are the outputs.";
-# print "A and B = {a and b}";
-# print "A or B = {a or b}";
+print "A and B = {a and b}";
+print "A or B = {a or b}";
 
 print;
 print 1;

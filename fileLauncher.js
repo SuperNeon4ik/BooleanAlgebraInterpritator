@@ -9,9 +9,10 @@ const ParsingError = {
 };
 
 function parse(plainText) {
-    let generalTokens = plainText.trim().replace(/\s+/g, " ")
+    const generalTokens = plainText.trim().replace(/\s+/g, " ")
         .split(/\s*;\s*\n*\s*/g);
-    let tokens = [];
+    const tokens = [];
+    const variables = [];
 
     let errorCount = 0;
     generalTokens.forEach((el, i) => {
@@ -76,7 +77,7 @@ function parse(plainText) {
                 if (el2 != "") {
                     let parsingError = ParsingError.NONE;
                     try {
-                        if (el2 == "and" || el2 == "or") {
+                        if (el2 == "and" || el2 == "or" || el2 == "=") {
                             if (i2 <= 0 || i2 >= subtokens.length - 1) parsingError = ParsingError.WRONG_USAGE;
                             else {
                                 let str1 = pretokens.pop();
@@ -93,29 +94,38 @@ function parse(plainText) {
                                 else if (str2 == 1) val2 = true;
                                 else val2 = null;
 
-                                if (val1 == null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
-                                else {
-                                    let result = undefined;
-
-                                    if (el2 == "and") {
-                                        if (val1 && val2) result = val1;
-                                        else if (!val1 && !val2) result = val1;
-                                        else if (!val1 && val2) result = val1;
-                                        else if (val1 && !val2) result = val2;
-                                    }
-                                    else if (el2 == "or") {
-                                        if (val1 && val2) result = val1;
-                                        else if (!val1 && !val2) result = val1;
-                                        else if (!val1 && val2) result = val1;
-                                        else if (val1 && !val2) result = val2;
-                                    }
-
-                                    if (result == undefined) parsingError = ParsingError.UNEXPECTED_ERROR;
+                                if (el2 == "and" || el2 == "or") {
+                                    if (val1 == null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
                                     else {
-                                        subtokens[i2 + 1] = result ? "1" : "0";
+                                        let result = undefined;
 
-                                        if (debugMode) 
-                                            chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
+                                        if (el2 == "and") {
+                                            if (val1 && val2) result = val1;
+                                            else if (!val1 && !val2) result = val1;
+                                            else if (!val1 && val2) result = val1;
+                                            else if (val1 && !val2) result = val2;
+                                        }
+                                        else if (el2 == "or") {
+                                            if (val1 && val2) result = val1;
+                                            else if (!val1 && !val2) result = val1;
+                                            else if (!val1 && val2) result = val1;
+                                            else if (val1 && !val2) result = val2;
+                                        }
+
+                                        if (result == undefined) parsingError = ParsingError.UNEXPECTED_ERROR;
+                                        else {
+                                            subtokens[i2 + 1] = result ? "1" : "0";
+
+                                            if (debugMode) 
+                                                chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
+                                        }
+                                    }
+                                }
+                                else if (el2 == "=") {
+                                    // setting variable's value
+                                    if (val1 != null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
+                                    else {
+                                        variables[str1] = val2;
                                     }
                                 }
                             }
