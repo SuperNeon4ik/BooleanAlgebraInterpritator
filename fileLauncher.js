@@ -19,6 +19,7 @@ function parse(plainText) {
             let subtokens = el.split(/(?<!".*)\s+(?!.*")/g);
             let pretokens = [];
 
+            // parsing 'not'
             subtokens.forEach((el2, i2) => {
                 if (el2 != "") {
                     let parsingError = ParsingError.NONE;
@@ -42,6 +43,26 @@ function parse(plainText) {
                                 }
                             }
                         }
+                        else if (el2.startsWith("print \"")) {
+                            let text = /(?<=").+(?=")/g.exec(el2)[0];
+                            const tags = /{.+}/g.exec(text);
+
+                            if (tags != null) {
+                                tags.forEach((el3, i3) => {
+                                    const code = el3.substring(1, el3.length - 1);
+                                    const output = parse(code);
+
+                                    text = text.replace(el3, output + "");
+                                    if (debugMode)
+                                        chatColor.log(`&6bDEBUG &0dString Tag : &0a'${el3}' => '${output}'`);
+                                });
+                            }
+
+                            text = text.replace(/\\n/g, "\n&4bOUT &0a");
+                            text = text.replace(/\\t/g, "\t");
+
+                            subtokens[i2] = "print \"" + text + "\"";
+                        }
                     }
                     catch (err) {
                         parsingError = ParsingError.UNEXPECTED_ERROR;
@@ -50,6 +71,7 @@ function parse(plainText) {
                 }
             });
 
+            // parsing 'and' & 'or'
             subtokens.forEach((el2, i2) => {
                 if (el2 != "") {
                     let parsingError = ParsingError.NONE;
