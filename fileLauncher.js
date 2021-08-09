@@ -19,6 +19,38 @@ function parse(plainText) {
         if (!el.startsWith("#") && el != "") {
             let subtokens = el.split(/(?<!".*)\s+(?!.*")/g);
             let pretokens = [];
+
+            subtokens.forEach((el2, i2) => {
+                if (el2 != "") {
+                    let parsingError = ParsingError.NONE;
+                    try {
+                        if (el2 == "not") {
+                            if (i2 >= subtokens.length - 1) parsingError = ParsingError.WRONG_USAGE;
+                            else {
+                                let oldValue = subtokens[i2 + 1];
+                                let value = null;
+
+                                if (oldValue == 1) value = "0";
+                                else if (oldValue == 0) value = "1";
+
+                                if (value == null) parsingError = ParsingError.WRONG_USAGE;
+                                else {
+                                    subtokens[i2] = "";
+                                    subtokens[i2 + 1] = value;
+
+                                    if (debugMode) 
+                                        chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${el2} ${oldValue} = ${value}`);
+                                }
+                            }
+                        }
+                    }
+                    catch (err) {
+                        parsingError = ParsingError.UNEXPECTED_ERROR;
+                        if (debugMode) console.log(err);
+                    }
+                }
+            });
+
             subtokens.forEach((el2, i2) => {
                 if (el2 != "") {
                     let parsingError = ParsingError.NONE;
@@ -115,7 +147,17 @@ function deploy(tokens) {
     tokens.forEach((el, i) => {
         if (el[0].startsWith("print")) {
             let text = el[1];
-            if (text == undefined) text = el[0].substring(7, el[0].length - 1);
+            if (text == undefined)
+                text = el[0].substring(7, el[0].length - 1);
+            else if (el.length == 1) {
+                chatColor.log("");
+            }
+            else if (el.length > 2)
+                chatColor.log("&1bERR &0dUnexpected argument count for token 'print'. &0aToken string : '" + el + "'")
+            else {
+                if (text != 1 && text != 0) 
+                    chatColor.log("&1bERR &0dUnexpected token. &0aToken string : '" + el + "'")
+            }
             chatColor.log("&4bOUT &0a" + text);
         }
     });
