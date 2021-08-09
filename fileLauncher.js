@@ -8,11 +8,14 @@ const ParsingError = {
     UNEXPECTED_ERROR: "UNEXPECTED_ERROR" 
 };
 
-function parse(plainText) {
+let variables = {};
+
+function parse(plainText, isSubParse) {
     const generalTokens = plainText.trim().replace(/\s+/g, " ")
         .split(/\s*;\s*\n*\s*/g);
     const tokens = [];
-    const variables = [];
+
+    if (isSubParse != true) variables = {};
 
     let errorCount = 0;
     generalTokens.forEach((el, i) => {
@@ -31,6 +34,8 @@ function parse(plainText) {
                                 let oldValue = subtokens[i2 + 1];
                                 let value = null;
 
+                                if (variables[oldValue] != undefined) oldValue = variables[oldValue];
+
                                 if (oldValue == 1) value = "0";
                                 else if (oldValue == 0) value = "1";
 
@@ -39,7 +44,7 @@ function parse(plainText) {
                                     subtokens[i2] = "";
                                     subtokens[i2 + 1] = value;
 
-                                    if (debugMode) 
+                                    if (debugMode && isSubParse != true) 
                                         chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${el2} ${oldValue} = ${value}`);
                                 }
                             }
@@ -54,11 +59,19 @@ function parse(plainText) {
                             if (tags != null) {
                                 tags.forEach((el3, i3) => {
                                     const code = el3.substring(1, el3.length - 1);
-                                    const output = parse(code);
+                                    const output = parse(code, true);
 
-                                    text = text.replace(el3, output + "");
-                                    if (debugMode)
-                                        chatColor.log(`&6bDEBUG &0dString Tag : &0a'${el3}' => '${output}'`);
+                                    if (output[1] != undefined) {
+                                        errorCount += output[1];
+                                        text = text.replace(el3, output[0] + "");
+                                        if (debugMode)
+                                            chatColor.log(`&1bERR &0dString Tag : &0a'${el3}' => '${output[0]}'`);
+                                    }
+                                    else {
+                                        text = text.replace(el3, output + "");
+                                        if (debugMode)
+                                            chatColor.log(`&6bDEBUG &0dString Tag : &0a'${el3}' => '${output}'`);
+                                    }
                                 });
                             }
 
@@ -82,6 +95,19 @@ function parse(plainText) {
                             else {
                                 let str1 = pretokens.pop();
                                 let str2 = subtokens[i2 + 1];
+
+                                if (el2 != "=") {
+                                    if (variables[str1] != undefined) {
+                                        if (debugMode) 
+                                            chatColor.log(`&6bDEBUG &0a${str1} &0d=> &0a${variables[str1]}`);
+                                        str1 = variables[str1];
+                                    }
+                                }
+                                if (variables[str2] != undefined) {
+                                    if (debugMode) 
+                                        chatColor.log(`&6bDEBUG &0a${str2} &0d=> &0a${variables[str2]}`);
+                                    str2 = variables[str2];
+                                }
 
                                 let val1 = undefined;
                                 let val2 = undefined;
@@ -116,7 +142,7 @@ function parse(plainText) {
                                         else {
                                             subtokens[i2 + 1] = result ? "1" : "0";
 
-                                            if (debugMode) 
+                                            if (debugMode && isSubParse != true) 
                                                 chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
                                         }
                                     }
@@ -125,7 +151,11 @@ function parse(plainText) {
                                     // setting variable's value
                                     if (val1 != null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
                                     else {
-                                        variables[str1] = val2;
+                                        variables[str1] = str2;
+                                        subtokens[i2 + 1] = "";
+
+                                        if (debugMode && isSubParse != true) 
+                                            chatColor.log(`&6bDEBUG &0dSet the variable value at T${i}S${i2} : &0a${str1} = ${val2}`);
                                     }
                                 }
                             }
@@ -154,7 +184,7 @@ function parse(plainText) {
                         return null;
                     }
 
-                    if (debugMode) chatColor.log(`&6bDEBUG &0dT${i}S${i2} : &0a${el2}`);
+                    if (debugMode && isSubParse != true) chatColor.log(`&6bDEBUG &0dT${i}S${i2} : &0a${el2}`);
                 }
             });
 
@@ -163,11 +193,16 @@ function parse(plainText) {
     });
 
     if (errorCount > 0) {
-        chatColor.log(`&1bFATAL ERR &0dGot ${errorCount} errors. &0aSee the list above.`);
-        return null;   
+        if (isSubParse) {
+            return [null, errorCount];
+        }
+        else {
+            chatColor.log(`&1bFATAL ERR &0dGot ${errorCount} errors. &0aSee the list above.`);
+            return null;   
+        }
     }
     
-    if (debugMode) chatColor.log(`&6bINFO &0aSuccessfully parsed the code.`);
+    if (debugMode && isSubParse != true) chatColor.log(`&6bINFO &0aSuccessfully parsed the code.`);
     return tokens;
 }
 
@@ -176,32 +211,34 @@ function deploy(tokens) {
         chatColor.log("&6bDEBUG &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
 
     tokens.forEach((el, i) => {
-        el.forEach((el2, i2) => {
-            const regexExec = /(?<=").+(?=")/g.exec(el2);
-            if (regexExec != null) {
-                const original = regexExec[0];
-                let text = original;
+        if (el[0] != undefined && el[0] != null) {
+            el.forEach((el2, i2) => {
+                const regexExec = /(?<=").+(?=")/g.exec(el2);
+                if (regexExec != null) {
+                    const original = regexExec[0];
+                    let text = original;
 
-                text = text.replace(/\\n/g, "\n&4bOUT &0a");
-                text = text.replace(/\\t/g, "\t");
-                el[i2] = el2.replace(original, text);
-            }   
-        });
+                    text = text.replace(/\\n/g, "\n&4bOUT &0a");
+                    text = text.replace(/\\t/g, "\t");
+                    el[i2] = el2.replace(original, text);
+                }   
+            });
 
-        if (el[0].startsWith("print")) {
-            let text = el[1];
+            if (el[0].startsWith("print")) {
+                let text = el[1];
 
-            if (el[0].trim() == "print" && el.length == 1)
-                text = "";
-            else if (text == undefined)
-                text = el[0].substring(7, el[0].length - 1);
-            else if (el.length > 2)
-                chatColor.log("&1bERR &0dUnexpected argument count for token 'print'. &0aToken string : '" + el + "'")
-            else {
-                if (text != 1 && text != 0) 
-                    chatColor.log("&1bERR &0dUnexpected token. &0aToken string : '" + el + "'")
+                if (el[0].trim() == "print" && el.length == 1)
+                    text = "";
+                else if (text == undefined)
+                    text = el[0].substring(7, el[0].length - 1);
+                else if (el.length > 2)
+                    chatColor.log("&1bERR &0dUnexpected argument count for token 'print'. &0aToken string : '" + el + "'")
+                else {
+                    if (text != 1 && text != 0) 
+                        chatColor.log("&1bERR &0dUnexpected token. &0aToken string : '" + el + "'")
+                }
+                chatColor.log("&4bOUT &0a" + text);
             }
-            chatColor.log("&4bOUT &0a" + text);
         }
     });
 }

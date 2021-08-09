@@ -59,13 +59,13 @@ function runTheProvidedFile() {
                 fileLauncher.execute(contents, isDebugMode);
             }
             catch (ex) {
-                ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "Failed to execute the code '" + file + "'.");
+                ChatColor.log(ChatColor.FG_RED + "FATAL ERR " + ChatColor.CC_EXTRA_WHITE + "Failed to execute the code '" + file + "'.");
                 if (isDebugMode) console.log(ex);
                 return;
             }
         }
         catch (ex) {
-            ChatColor.log(ChatColor.FG_RED + "ERR " + ChatColor.CC_EXTRA_WHITE + "Can't read the file '" + file + "'.");
+            ChatColor.log(ChatColor.FG_RED + "FATAL ERR " + ChatColor.CC_EXTRA_WHITE + "Can't read the file '" + file + "'.");
             return;  
         }
     }

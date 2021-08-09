@@ -7,13 +7,14 @@ b = 0;
 print "Here are the outputs.";
 print "A and B = {a and b}";
 print "A or B = {a or b}";
+print "A or not B = {a or not b}";
 
 print;
 print 1;
 print 0;
 print not 1;
 print not 0;
-print 0 and 1;
+print not 0 and not 1;
 print 1 and 1;
 print 0 and 0;
 print 0 or 1;
