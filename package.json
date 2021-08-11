@@ -1,6 +1,6 @@
 {
   "name": "boolean-algebra-interpritator",
-  "version": "0.0.025",
+  "version": "0.0.026",
   "description": "Interpritator of The Boolean Algebra",
   "main": "index.js",
   "scripts": {

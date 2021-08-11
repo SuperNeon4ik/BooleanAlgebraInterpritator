@@ -1,6 +1,8 @@
 print "Provide your inputs:";
-a = input "a = ";
-b = input "b = ";
+#a = input "a = ";
+#b = input "b = ";
+a = 1;
+b = 0;
 
 print "\nHere are the outputs:";
 print "A and B = {a and b}";

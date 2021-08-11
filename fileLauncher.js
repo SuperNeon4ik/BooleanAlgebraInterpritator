@@ -60,7 +60,8 @@ function parse(plainText, isSubParse) {
                                 let oldValue = subtokens[i2 + 1];
                                 let value = null;
 
-                                if (variables[oldValue] != undefined) oldValue = variables[oldValue];
+                                if (getVariableValue(oldValue, false) != undefined) 
+                                    oldValue = getVariableValue(oldValue, false);
 
                                 if (oldValue == 1) value = "0";
                                 else if (oldValue == 0) value = "1";
@@ -80,7 +81,7 @@ function parse(plainText, isSubParse) {
                         if (regexExec != null) {
                             const original = regexExec[0];
                             let text = original;
-                            const tags = /{.+}/g.exec(text);
+                            const tags = /(?<!\\){.+}/g.exec(text);
 
                             if (tags != null) {
                                 tags.forEach((el3, i3) => {
@@ -123,16 +124,16 @@ function parse(plainText, isSubParse) {
                                 let str2 = subtokens[i2 + 1];
 
                                 if (el2 != "=") {
-                                    if (variables[str1] != undefined) {
+                                    if (getVariableValue(str1, false) != undefined) {
                                         if (debugMode) 
-                                            chatColor.log(`&3bDEBUG &0a${str1} &0d=> &0a${variables[str1]}`);
-                                        str1 = variables[str1];
+                                            chatColor.log(`&3bDEBUG &0a${str1} &0d=> &0a${getVariableValue(str1, false)}`);
+                                        str1 = getVariableValue(str1, false);
                                     }
                                 }
-                                if (variables[str2] != undefined) {
+                                if (getVariableValue(str2, false) != undefined) {
                                     if (debugMode) 
-                                        chatColor.log(`&3bDEBUG &0a${str2} &0d=> &0a${variables[str2]}`);
-                                    str2 = variables[str2];
+                                        chatColor.log(`&3bDEBUG &0a${str2} &0d=> &0a${getVariableValue(str2, false)}`);
+                                    str2 = getVariableValue(str2, false);
                                 }
 
                                 let val1 = undefined;
@@ -175,10 +176,26 @@ function parse(plainText, isSubParse) {
                                 }
                                 else if (el2 == "=") {
                                     // setting variable's value
-                                    if (val1 != null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
+                                    if (str2 == "input" && val1 == null) {
+                                        if (/[a-z,A-Z]+/g.test(str1) && !WrongVariableNames.includes(str1)) {
+                                            variables[str1] = {
+                                                value: "0",
+                                                isDynamic: true
+                                            };
+                                            subtokens[i2 + 1] = "";
+
+                                            if (debugMode && isSubParse != true) 
+                                                chatColor.log(`&3bDEBUG &0dSet the dynamic variable value at T${i}S${i2} : &0a${str1} = input`);
+                                        }
+                                        else parsingError = ParsingError.WRONG_USAGE;
+                                    }
+                                    else if (val1 != null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
                                     else {
                                         if (/[a-z,A-Z]+/g.test(str1) && !WrongVariableNames.includes(str1)) {
-                                            variables[str1] = str2;
+                                            variables[str1] = {
+                                                value: str2,
+                                                isDynamic: false
+                                            };
                                             subtokens[i2 + 1] = "";
 
                                             if (debugMode && isSubParse != true) 
@@ -189,10 +206,10 @@ function parse(plainText, isSubParse) {
                                 }
                             }
                         }
-                        else if (variables[el2] != undefined) {
+                        else if (getVariableValue(el2, false) != undefined) {
                             if (debugMode) 
-                                chatColor.log(`&3bDEBUG &0a${el2} &0d=> &0a${variables[el2]}`);
-                            pretokens.push(variables[el2]);
+                                chatColor.log(`&3bDEBUG &0a${el2} &0d=> &0a${getVariableValue(el2, false)}`);
+                            pretokens.push(getVariableValue(el2, false));
                         }
                         else pretokens.push(el2);                    
                     }
@@ -263,6 +280,7 @@ function deploy(tokens) {
 
                     text = text.replace(/\\n/g, "\n&4bOUT &0a");
                     text = text.replace(/\\t/g, "\t");
+                    text = text.replace(/\\{/g, "{");
                     el[i2] = el2.replace(original, text);
                 }   
             });
@@ -296,6 +314,16 @@ function execute(plainText, isDebugMode, doOutputParse) {
     if (tokens == null) throw "Tokens can't be NULL";
     else {
         deploy(tokens);
+    }
+}
+
+function getVariableValue(name, isDynamic) {
+    if (variables[name] == undefined) return undefined;
+    else {
+        const variable = variables[name];
+        if (variable.isDynamic && isDynamic) return variable.value;
+        else if (!variable.isDynamic && !isDynamic) return variable.value;
+        else return undefined;
     }
 }
 
