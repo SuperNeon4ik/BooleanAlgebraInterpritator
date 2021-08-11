@@ -14,14 +14,17 @@ const readline = rl.createInterface({
 
 // Initialize variables
 const isDebugMode = process.argv.findIndex(el => el.toLowerCase() == "--debug-mode") > -1;
+const outputParsing = process.argv.findIndex(el => el.toLowerCase() == "--parse-output") > -1;
 
 // Output info about the package
 ChatColor.log(`${packageConfig.name} by ${packageConfig.author}.\n` +
     `Version : ${packageConfig.version} &1bPROTOTYPE VERSION\n`);
-if (isDebugMode) ChatColor.log("&3bWARNING &0dDebug Mode is enabled.\n");
+if (isDebugMode) ChatColor.log("&3bWARNING &0dDebug Mode is enabled.");
+if (outputParsing) ChatColor.log("&3bWARNING &0dParsing Output is enabled.");
+if (isDebugMode || outputParsing) console.log();
 
 // DEBUG : Output handled arguments
-if (isDebugMode) ChatColor.log("&6bDEBUG &0dHandled arguments : &0a[ " + process.argv.join(", ") + " ]");
+if (isDebugMode) ChatColor.log("&3bDEBUG &0dHandled arguments : &0a[ " + process.argv.join(", ") + " ]");
 
 // Check if file is provided in arguments
 if (process.argv.length < (isDebugMode ? 4 : 3)) {
@@ -56,7 +59,7 @@ function runTheProvidedFile() {
             if (isDebugMode) ChatColor.log(ChatColor.FG_CYAN + "INFO " + ChatColor.CC_EXTRA_WHITE + `File ('${file}') contents found.`);
 
             try {
-                fileLauncher.execute(contents, isDebugMode);
+                fileLauncher.execute(contents, isDebugMode, outputParsing);
             }
             catch (ex) {
                 ChatColor.log(ChatColor.FG_RED + "FATAL ERR " + ChatColor.CC_EXTRA_WHITE + "Failed to execute the code '" + file + "'.");

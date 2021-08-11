@@ -1,6 +1,7 @@
 const chatColor = require("./modules/ChatColor");
 
 var debugMode = false;
+var outputParse = false;
 const ParsingError = { 
     NONE: "NONE",
     WRONG_USAGE: "WRONG_USAGE", 
@@ -8,6 +9,7 @@ const ParsingError = {
     UNEXPECTED_ERROR: "UNEXPECTED_ERROR" 
 };
 
+const WrongVariableNames = [ "print", "and", "or", "not", "="]
 let variables = {};
 
 function parse(plainText, isSubParse) {
@@ -20,8 +22,37 @@ function parse(plainText, isSubParse) {
     let errorCount = 0;
     generalTokens.forEach((el, i) => {
         if (!el.startsWith("#") && el != "") {
+            const preresolveTokens = /(?<!\(.*)\(.*\)(?!.*\))/g.exec(el);
+
+            //console.log(preresolveTokens);
+            if (preresolveTokens != null) {
+                preresolveTokens.forEach((el2, i2) => {
+                    const code = el2.substring(1, el2.length - 1);
+                    const output = parse(code, true);
+
+                    if (output[1] != undefined) {
+                        errorCount += output[1];
+                        el = el.replace(el2, output[0] + "");
+                        if (debugMode)
+                            chatColor.log(`&1bERR &0dPreresolve Token : &0a'${code}' => '${output[0]}'`);
+                    }
+                    else {
+                        el = el.replace(el2, output + "");
+                        if (debugMode)
+                            chatColor.log(`&3bDEBUG &0dPreresolve Token : &0a'${code}' => '${output}'`);
+                    }
+                });
+            }
+
             let subtokens = el.split(/(?<!".*)\s+(?!.*")/g);
             let pretokens = [];
+
+            if (debugMode && isSubParse != true)
+                chatColor.log(`&3bDEBUG &0dT${i} : &0a[ ${subtokens.join(", ")} ]`);
+
+            subtokens.forEach((el2, i2) => {
+
+            });
 
             // parsing 'not' and strings
             subtokens.forEach((el2, i2) => {
@@ -45,7 +76,7 @@ function parse(plainText, isSubParse) {
                                     subtokens[i2 + 1] = value;
 
                                     if (debugMode && isSubParse != true) 
-                                        chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${el2} ${oldValue} = ${value}`);
+                                        chatColor.log(`&3bDEBUG &0dMade an action at T${i}S${i2} : &0a${el2} ${oldValue} = ${value}`);
                                 }
                             }
                         }
@@ -70,7 +101,7 @@ function parse(plainText, isSubParse) {
                                     else {
                                         text = text.replace(el3, output + "");
                                         if (debugMode)
-                                            chatColor.log(`&6bDEBUG &0dString Tag : &0a'${el3}' => '${output}'`);
+                                            chatColor.log(`&3bDEBUG &0dString Tag : &0a'${el3}' => '${output}'`);
                                     }
                                 });
                             }
@@ -99,13 +130,13 @@ function parse(plainText, isSubParse) {
                                 if (el2 != "=") {
                                     if (variables[str1] != undefined) {
                                         if (debugMode) 
-                                            chatColor.log(`&6bDEBUG &0a${str1} &0d=> &0a${variables[str1]}`);
+                                            chatColor.log(`&3bDEBUG &0a${str1} &0d=> &0a${variables[str1]}`);
                                         str1 = variables[str1];
                                     }
                                 }
                                 if (variables[str2] != undefined) {
                                     if (debugMode) 
-                                        chatColor.log(`&6bDEBUG &0a${str2} &0d=> &0a${variables[str2]}`);
+                                        chatColor.log(`&3bDEBUG &0a${str2} &0d=> &0a${variables[str2]}`);
                                     str2 = variables[str2];
                                 }
 
@@ -143,7 +174,7 @@ function parse(plainText, isSubParse) {
                                             subtokens[i2 + 1] = result ? "1" : "0";
 
                                             if (debugMode && isSubParse != true) 
-                                                chatColor.log(`&6bDEBUG &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
+                                                chatColor.log(`&3bDEBUG &0dMade an action at T${i}S${i2} : &0a${val1} ${el2} ${val2} = ${result}`);
                                         }
                                     }
                                 }
@@ -151,18 +182,24 @@ function parse(plainText, isSubParse) {
                                     // setting variable's value
                                     if (val1 != null || val2 == null) parsingError = ParsingError.WRONG_USAGE;
                                     else {
-                                        variables[str1] = str2;
-                                        subtokens[i2 + 1] = "";
+                                        if (/[a-z,A-Z]+/g.test(str1) && !WrongVariableNames.includes(str1)) {
+                                            variables[str1] = str2;
+                                            subtokens[i2 + 1] = "";
 
-                                        if (debugMode && isSubParse != true) 
-                                            chatColor.log(`&6bDEBUG &0dSet the variable value at T${i}S${i2} : &0a${str1} = ${val2}`);
+                                            if (debugMode && isSubParse != true) 
+                                                chatColor.log(`&3bDEBUG &0dSet the variable value at T${i}S${i2} : &0a${str1} = ${val2}`);
+                                        }
+                                        else parsingError = ParsingError.WRONG_USAGE;
                                     }
                                 }
                             }
                         }
-                        else {
-                            pretokens.push(el2);
+                        else if (variables[el2] != undefined) {
+                            if (debugMode) 
+                                chatColor.log(`&3bDEBUG &0a${el2} &0d=> &0a${variables[el2]}`);
+                            pretokens.push(variables[el2]);
                         }
+                        else pretokens.push(el2);                    
                     }
                     catch (err) {
                         parsingError = ParsingError.UNEXPECTED_ERROR;
@@ -184,11 +221,11 @@ function parse(plainText, isSubParse) {
                         return null;
                     }
 
-                    if (debugMode && isSubParse != true) chatColor.log(`&6bDEBUG &0dT${i}S${i2} : &0a${el2}`);
+                    // if (debugMode && isSubParse != true) chatColor.log(`&3bDEBUG &0dT${i}S${i2} : &0a${el2}`);
                 }
             });
 
-            tokens.push(pretokens);
+            if (pretokens.length > 0) tokens.push(pretokens);
         }
     });
 
@@ -203,12 +240,25 @@ function parse(plainText, isSubParse) {
     }
     
     if (debugMode && isSubParse != true) chatColor.log(`&6bINFO &0aSuccessfully parsed the code.`);
+
+    if (outputParse && isSubParse != true) {
+        chatColor.log(`&6bINFO &0aOutputting parse code.`);
+        const fs = require("fs");
+
+        let output = "";
+        tokens.forEach((el, i) => {
+            output += el.join(" ") + ";\n";
+        });
+
+        fs.writeFileSync("parseOutput.boolscript", output);
+    }
+
     return tokens;
 }
 
 function deploy(tokens) {
     if (debugMode)
-        chatColor.log("&6bDEBUG &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
+        chatColor.log("&3bDEBUG &0dDEPLOY - Got an input : &0a[ '" + tokens.join("', '") + "' ]");
 
     tokens.forEach((el, i) => {
         if (el[0] != undefined && el[0] != null) {
@@ -243,9 +293,11 @@ function deploy(tokens) {
     });
 }
 
-function execute(plainText, isDebugMode) {
+function execute(plainText, isDebugMode, doOutputParse) {
     if (typeof (isDebugMode) == "boolean")
         debugMode = isDebugMode;
+    if (typeof (doOutputParse) == "boolean")
+        outputParse = doOutputParse;
 
     const tokens = parse(plainText);
     if (tokens == null) throw "Tokens can't be NULL";
