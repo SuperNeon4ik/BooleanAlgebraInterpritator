@@ -24,7 +24,6 @@ function parse(plainText, isSubParse) {
         if (!el.startsWith("#") && el != "") {
             const preresolveTokens = /(?<!\(.*)\(.*\)(?!.*\))/g.exec(el);
 
-            //console.log(preresolveTokens);
             if (preresolveTokens != null) {
                 preresolveTokens.forEach((el2, i2) => {
                     const code = el2.substring(1, el2.length - 1);
@@ -49,10 +48,6 @@ function parse(plainText, isSubParse) {
 
             if (debugMode && isSubParse != true)
                 chatColor.log(`&3bDEBUG &0dT${i} : &0a[ ${subtokens.join(", ")} ]`);
-
-            subtokens.forEach((el2, i2) => {
-
-            });
 
             // parsing 'not' and strings
             subtokens.forEach((el2, i2) => {
@@ -220,8 +215,6 @@ function parse(plainText, isSubParse) {
                         chatColor.log(`&1bERR &0dParsing Error : ${errorDesc}. &0aT${i}S${i2} - Line ${i}.`);
                         return null;
                     }
-
-                    // if (debugMode && isSubParse != true) chatColor.log(`&3bDEBUG &0dT${i}S${i2} : &0a${el2}`);
                 }
             });
 
