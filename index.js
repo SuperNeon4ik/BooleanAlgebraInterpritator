@@ -18,7 +18,7 @@ const outputParsing = process.argv.findIndex(el => el.toLowerCase() == "--parse-
 
 // Output info about the package
 ChatColor.log(`${packageConfig.name} by ${packageConfig.author}.\n` +
-    `Version : ${packageConfig.version} &1bPROTOTYPE VERSION\n`);
+    `Version : ${packageConfig.version} ${getVersionTypeCaption()}\n`);
 if (isDebugMode) ChatColor.log("&3bWARNING &0dDebug Mode is enabled.");
 if (outputParsing) ChatColor.log("&3bWARNING &0dParsing Output is enabled.");
 if (isDebugMode || outputParsing) console.log();
@@ -38,6 +38,20 @@ else {
 readline.close(); // close since we don't use readline yet.
 
 /* FUNCTIONS */
+
+function getVersionTypeCaption() {
+    const version = packageConfig.version;
+    const versionParts = version.split(".");
+    
+    if (versionParts.length <= 2) return "&2bSTABLE VERSION&0a";
+    else if (versionParts == 3) return "&3bBETA VERSION&0a";
+    else {
+        const lastPart = versionParts[versionParts.length - 1];
+        if (lastPart.length == 1) return "&2dALPHA VERSION&0a";
+        else if (lastPart.length == 2) return "&1bPROTOTYPE VERSION&0a";
+        else return "&1dDEVELOPMENT VERSION&0a";
+    }
+}
 
 function runTheProvidedFile() {
     let file = undefined;

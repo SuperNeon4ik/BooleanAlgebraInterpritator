@@ -13,7 +13,7 @@ const WrongVariableNames = [ "print", "and", "or", "not", "="]
 let variables = {};
 
 function parse(plainText, isSubParse) {
-    const generalTokens = plainText.trim().replace(/\s+/g, " ")
+    const generalTokens = plainText.trim().replace(/(\s+\n*)+/g, " ")
         .split(/\s*;\s*\n*\s*/g);
     const tokens = [];
 
