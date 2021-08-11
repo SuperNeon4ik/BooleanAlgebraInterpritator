@@ -8,3 +8,5 @@ Boolean Algebra Interpritator
 [![GitHub](https://img.shields.io/github/followers/SuperNeon4ik?label=GitHub&style=flat-square)](https://github.com/SuperNeon4ik)
 ---
 File extention : `.boolscript` (Boolean-algebra Script)
+
+###### **P.S.:** This project is made just for education purposes of mine.

@@ -1,9 +1,20 @@
-a = 1;
-b = 0;
-c = ((not (a and b)) or 0);
+print "the start";
 
-print (1 or 0);
-print "C : {c}";
-print "A and B : {a and b}";
-# print "A and not B : {a and (not b)}";
-# print "A and (A or B) : {a and (a or b)}";
+for 5 {
+    print "sus";
+}
+
+a = 1;
+if a {
+    print "a";
+}
+else {
+    print "a else";
+}
+
+while a {
+    print "while a";
+    a = not a;
+}
+
+print "the end";
